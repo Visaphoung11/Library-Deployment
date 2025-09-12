@@ -208,3 +208,56 @@ app.get("/healthz", (req, res) => res.json({ status: "ok" }));
 - Verified other routes continue to work via the wrapper.
 
 You can now build further features on PostgreSQL while keeping existing route code mostly unchanged. Enjoy!
+
+---
+
+## Deploying to Vercel
+
+We prepared the codebase for Vercel’s Serverless Functions.
+
+### Files added
+
+- `app.js`: exports the Express app (middleware + routes) without starting a server.
+- `api/index.js`: Vercel entry that exports the app.
+- `vercel.json`: routes all requests to `api/index.js` and selects Node 18 runtime.
+
+### Environment variables on Vercel
+
+Set these in Vercel Project Settings → Environment Variables (Production and Preview):
+
+- `DB_HOST`
+- `DB_USER`
+- `DB_PASS`
+- `DB_NAME`
+- `DB_PORT` → `5432`
+- `JWT_SECRET`
+- `PGSSL` → set to `true` if your Postgres requires SSL (common on cloud providers)
+
+### Deploy steps
+
+1. Install Vercel CLI (optional):
+
+```bash
+npm i -g vercel
+```
+
+2. From the project root, run:
+
+```bash
+vercel
+```
+
+Follow prompts (scope, project name). For production deploy:
+
+```bash
+vercel --prod
+```
+
+### Local vs Vercel
+
+- Local dev uses `index.js` to listen on a port.
+- Vercel uses `api/index.js` to serve the same `app` as a serverless function.
+
+### Swagger on Vercel
+
+Swagger will be served under `/api-docs` (e.g., `https://your-project.vercel.app/api-docs`). If assets don’t load, ensure the `vercel.json` routing is in place and retry after a hard refresh.
